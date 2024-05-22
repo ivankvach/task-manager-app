@@ -1,33 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Task } from '../types';
 import TaskList from './TaskList';
+import { supabase } from '../supabaseClient';
 
 const TaskManager: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState<string>('');
 
-  const addTask = () => {
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    const { data, error } = await supabase.from('tasks').select('*');
+    if (error) {
+      console.error('Error fetching tasks:', error);
+    } else {
+      setTasks(data || []);
+    }
+  };
+
+  const addTask = async () => {
     if (newTaskTitle.trim() === '') return;
 
-    const newTask: Task = {
-      id: Date.now(),
-      title: newTaskTitle,
-      completed: false,
-    };
-    setTasks([...tasks, newTask]);
-    setNewTaskTitle('');
+    const { data, error } = await supabase
+      .from('tasks')
+      .insert([{ title: newTaskTitle, completed: false }])
+      .select();
+    if (error) {
+      console.error('Error adding task:', error);
+    } else {
+      setTasks([...tasks, ...data]);
+      setNewTaskTitle('');
+    }
   };
 
-  const toggleTaskCompletion = (id: number) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
-    );
+  const toggleTaskCompletion = async (id: number) => {
+    const task = tasks.find((task) => task.id === id);
+    if (task) {
+      const { data, error } = await supabase
+        .from('tasks')
+        .update({ completed: !task.completed })
+        .eq('id', id)
+        .select();
+      if (error) {
+        console.error('Error toggling task completion:', error);
+      } else {
+        setTasks(
+          tasks.map((t) =>
+            t.id === id ? { ...t, completed: !t.completed } : t
+          )
+        );
+      }
+    }
   };
 
-  const deleteTask = (id: number) => {
-    setTasks(tasks.filter((task) => task.id !== id));
+  const deleteTask = async (id: number) => {
+    const { error } = await supabase.from('tasks').delete().eq('id', id);
+    if (error) {
+      console.error('Error deleting task:', error);
+    } else {
+      setTasks(tasks.filter((task) => task.id !== id));
+    }
   };
 
   return (
