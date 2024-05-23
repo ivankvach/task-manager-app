@@ -45,6 +45,7 @@ const TaskManager: React.FC = () => {
         .select();
       if (error) {
         console.error('Error toggling task completion:', error);
+        console.log(data);
       } else {
         setTasks(
           tasks.map((t) =>
