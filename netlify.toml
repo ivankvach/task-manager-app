@@ -1,7 +1,0 @@
-[build]
-  command = "npm run build"
-  publish = "build"
-
-[build.environment]
-  SUPABASE_URL = 'https://dexjvunkseuyoytutsmg.supabase.co';
-  SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRleGp2dW5rc2V1eW95dHV0c21nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTYzNzYxNDksImV4cCI6MjAzMTk1MjE0OX0.vJ9y3PBZORziIDVdmt7Jg66Inuv9V0E2FlcmjQaOPFE';
